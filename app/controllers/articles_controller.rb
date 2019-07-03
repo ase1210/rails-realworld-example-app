@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  before_action :authenticate_user!, except: %i[index show]
+  before_action :authenticate_user!, except: %i[index show authors]
 
   def index
     @articles = Article.all.includes(:user)
@@ -23,6 +23,14 @@ class ArticlesController < ApplicationController
     @articles = @articles.order(created_at: :desc).offset(params[:offset] || 0).limit(params[:limit] || 20)
 
     render :index
+  end
+
+  def authors
+    @users = Article.all.includes(:user).map(&:user).uniq
+
+    @users_count = @users.count
+
+    render "/users/index"
   end
 
   def create
